@@ -1,0 +1,41 @@
+apply plugin: "jacoco"
+jacoco {
+    toolVersion = "0.8.3"
+}
+
+def fileFilter = ['**/*$*$*.*',
+                  '**/httpclient/factory/HttpClientFactory*',
+                  '**/httpclient/ObjectMapper*',
+                  '**/httpclient/BackendAddressProvider*',
+                  '**/exception/*'
+]
+def debugTree = fileTree(dir: "${buildDir}/classes/kotlin/main", excludes: fileFilter)
+
+jacocoTestReport {
+    reports {
+        html.enabled = true
+    }
+
+    afterEvaluate {
+        classDirectories.from = debugTree
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                element = 'BUNDLE'
+                counter = "LINE"
+                minimum = 1
+            }
+        }
+
+        afterEvaluate {
+            classDirectories.from = debugTree
+        }
+    }
+}
+
+test { finalizedBy jacocoTestReport }
+check.dependsOn(jacocoTestCoverageVerification)
