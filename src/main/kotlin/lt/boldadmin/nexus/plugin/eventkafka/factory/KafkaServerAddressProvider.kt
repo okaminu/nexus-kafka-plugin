@@ -1,4 +1,6 @@
-package lt.boldadmin.nexus.plugin.eventkafka.kafka
+package lt.boldadmin.nexus.plugin.eventkafka.factory
+
+import lt.boldadmin.nexus.plugin.eventkafka.KafkaServerAddressNotSetException
 
 
 class KafkaServerAddressProvider {

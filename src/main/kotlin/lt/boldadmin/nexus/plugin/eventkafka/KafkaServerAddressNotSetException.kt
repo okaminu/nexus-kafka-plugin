@@ -1,3 +1,3 @@
-package lt.boldadmin.nexus.plugin.eventkafka.kafka
+package lt.boldadmin.nexus.plugin.eventkafka
 
 object KafkaServerAddressNotSetException: RuntimeException()

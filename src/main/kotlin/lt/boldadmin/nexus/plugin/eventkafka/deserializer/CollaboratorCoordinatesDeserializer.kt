@@ -1,4 +1,4 @@
-package lt.boldadmin.nexus.plugin.eventkafka.kafka.deserializer
+package lt.boldadmin.nexus.plugin.eventkafka.deserializer
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

@@ -1,6 +1,5 @@
-package lt.boldadmin.nexus.plugin.eventkafka.kafka.factory
+package lt.boldadmin.nexus.plugin.eventkafka.factory
 
-import lt.boldadmin.nexus.plugin.eventkafka.kafka.KafkaServerAddressProvider
 import org.apache.kafka.common.serialization.StringSerializer
 import java.util.*
 

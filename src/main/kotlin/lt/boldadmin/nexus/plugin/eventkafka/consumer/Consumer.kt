@@ -1,13 +1,13 @@
-package lt.boldadmin.nexus.plugin.eventkafka.kafka.consumer
+package lt.boldadmin.nexus.plugin.eventkafka.consumer
 
-import lt.boldadmin.nexus.plugin.eventkafka.kafka.factory.KafkaConsumerFactory
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import java.time.Duration.ofSeconds
 import java.util.*
 
-open class Consumer(private val consumerFactory: KafkaConsumerFactory) {
+open class Consumer {
 
     fun <T>consume(topic: String, function: (T) -> Unit, properties: Properties) {
-        val consumer = consumerFactory.create<T>(properties)
+        val consumer = KafkaConsumer<String, T>(properties)
         consumer.subscribe(listOf(topic))
 
         executeInfinitely { consumer.poll(ofSeconds(1)).forEach { function(it.value()) } }

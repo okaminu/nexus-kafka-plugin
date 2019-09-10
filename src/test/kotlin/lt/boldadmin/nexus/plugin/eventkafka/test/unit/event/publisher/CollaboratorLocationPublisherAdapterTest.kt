@@ -4,11 +4,10 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import lt.boldadmin.nexus.api.type.valueobject.Coordinates
 import lt.boldadmin.nexus.api.type.valueobject.Message
-import lt.boldadmin.nexus.plugin.eventkafka.event.publisher.CollaboratorLocationPublisherAdapter
-import lt.boldadmin.nexus.plugin.eventkafka.kafka.factory.KafkaProducerFactory
-import lt.boldadmin.nexus.plugin.eventkafka.kafka.factory.ProducerPropertiesFactory
-import lt.boldadmin.nexus.plugin.eventkafka.kafka.serializer.CollaboratorCoordinatesSerializer
-import lt.boldadmin.nexus.plugin.eventkafka.kafka.serializer.MessageSerializer
+import lt.boldadmin.nexus.plugin.eventkafka.factory.KafkaProducerFactory
+import lt.boldadmin.nexus.plugin.eventkafka.factory.ProducerPropertiesFactory
+import lt.boldadmin.nexus.plugin.eventkafka.serializer.CollaboratorCoordinatesSerializer
+import lt.boldadmin.nexus.plugin.eventkafka.serializer.MessageSerializer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.junit.Before
@@ -38,7 +37,7 @@ class CollaboratorLocationPublisherAdapterTest {
         every { producerPropertiesFactory.create(CollaboratorCoordinatesSerializer::class.java) } returns properties
         every { producerSpy.send(any()) } returns mockk()
 
-        CollaboratorLocationPublisherAdapter(
+        CollaboratorCoordinatesProducer(
             factorySpy,
             producerPropertiesFactory
         ).publish(collaboratorId, coordinates)
@@ -58,7 +57,7 @@ class CollaboratorLocationPublisherAdapterTest {
         every { producerPropertiesFactory.create(MessageSerializer::class.java) } returns properties
         every { producerSpy.send(any()) } returns mockk()
 
-        CollaboratorLocationPublisherAdapter(
+        CollaboratorCoordinatesProducer(
             factorySpy,
             producerPropertiesFactory
         ).publish(message)

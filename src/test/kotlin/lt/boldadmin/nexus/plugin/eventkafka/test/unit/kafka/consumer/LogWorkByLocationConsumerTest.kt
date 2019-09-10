@@ -4,8 +4,8 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import lt.boldadmin.nexus.api.service.worklog.status.location.WorklogLocationService
 import lt.boldadmin.nexus.api.type.valueobject.Coordinates
+import lt.boldadmin.nexus.plugin.eventkafka.kafka.consumer.CollaboratorLocationConsumer
 import lt.boldadmin.nexus.plugin.eventkafka.kafka.consumer.Consumer
-import lt.boldadmin.nexus.plugin.eventkafka.kafka.consumer.LogWorkByLocationConsumer
 import lt.boldadmin.nexus.plugin.eventkafka.kafka.deserializer.CollaboratorCoordinatesDeserializer
 import lt.boldadmin.nexus.plugin.eventkafka.kafka.factory.ConsumerPropertiesFactory
 import org.junit.Before
@@ -23,12 +23,12 @@ class LogWorkByLocationConsumerTest {
     @MockK
     private lateinit var locationServiceSpy: WorklogLocationService
 
-    private lateinit var consumer: LogWorkByLocationConsumer
+    private lateinit var consumer: CollaboratorLocationConsumer
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        consumer = LogWorkByLocationConsumer(consumerPropertiesFactoryStub, consumerSpy, locationServiceSpy)
+        consumer = CollaboratorLocationConsumer(consumerPropertiesFactoryStub, consumerSpy, locationServiceSpy)
     }
 
     @Test
