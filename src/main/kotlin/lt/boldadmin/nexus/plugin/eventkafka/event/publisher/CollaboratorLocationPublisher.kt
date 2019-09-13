@@ -1,4 +1,4 @@
-package lt.boldadmin.nexus.plugin.eventkafka.producer
+package lt.boldadmin.nexus.plugin.eventkafka.event.publisher
 
 import lt.boldadmin.nexus.api.event.publisher.CollaboratorLocationPublisher
 import lt.boldadmin.nexus.api.type.valueobject.Coordinates
@@ -9,7 +9,7 @@ import lt.boldadmin.nexus.plugin.eventkafka.serializer.CollaboratorCoordinatesSe
 import lt.boldadmin.nexus.plugin.eventkafka.serializer.CollaboratorMessageSerializer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-class CollaboratorLocationProducer(
+class CollaboratorLocationPublisher(
     private val producerFactory: KafkaProducerFactory,
     private val producerPropertiesFactory: ProducerPropertiesFactory
 ): CollaboratorLocationPublisher {
