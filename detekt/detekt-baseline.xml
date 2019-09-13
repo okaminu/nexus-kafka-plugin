@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <Whitelist>
+    <ID>NoConsecutiveBlankLines:</ID>
+    <ID>TooManyFunctions:BackendHttpClient.kt$BackendHttpClient</ID>
+    <ID>TooManyFunctions:BackendHttpClientTest.kt$BackendHttpClientTest</ID>
+    <ID>TooManyFunctions:UserServiceClient.kt$UserServiceClient : UserService</ID>
+    <ID>TooManyFunctions:UserServiceClientTest.kt$UserServiceClientTest</ID>
+  </Whitelist>
+</SmellBaseline>
