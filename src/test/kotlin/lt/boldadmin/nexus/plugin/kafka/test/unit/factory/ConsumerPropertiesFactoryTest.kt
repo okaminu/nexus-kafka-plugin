@@ -1,15 +1,18 @@
-package lt.boldadmin.nexus.plugin.kafka.test.unit.kafka.factory
+package lt.boldadmin.nexus.plugin.kafka.test.unit.factory
 
 import io.mockk.every
+import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import lt.boldadmin.nexus.plugin.kafka.kafka.KafkaServerAddressProvider
-import lt.boldadmin.nexus.plugin.kafka.kafka.factory.ConsumerPropertiesFactory
+import lt.boldadmin.nexus.plugin.kafka.factory.ConsumerPropertiesFactory
+import lt.boldadmin.nexus.plugin.kafka.factory.KafkaServerAddressProvider
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.math.BigInteger
 import java.util.*
-import kotlin.test.assertEquals
 
+@ExtendWith(MockKExtension::class)
 class ConsumerPropertiesFactoryTest {
 
     @Test

@@ -1,22 +1,24 @@
-package lt.boldadmin.nexus.plugin.kafka.test.unit.kafka.consumer
+package lt.boldadmin.nexus.plugin.kafka.test.unit.consumer
 
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import io.mockk.verify
-import lt.boldadmin.nexus.plugin.kafka.kafka.consumer.Consumer
-import lt.boldadmin.nexus.plugin.kafka.kafka.factory.KafkaConsumerFactory
+import lt.boldadmin.nexus.plugin.kafka.consumer.Consumer
+import lt.boldadmin.nexus.plugin.kafka.factory.KafkaConsumerFactory
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.time.Duration
 import java.time.Duration.ofSeconds
 import java.util.*
-import kotlin.test.assertEquals
 
+@ExtendWith(MockKExtension::class)
 class ConsumerTest {
 
     @MockK
@@ -27,9 +29,8 @@ class ConsumerTest {
 
     private lateinit var consumer: Consumer
 
-    @Before
+    @BeforeEach
     fun setUp() {
-        MockKAnnotations.init(this)
         consumer = object: Consumer(consumerFactoryStub) {
             override fun executeInfinitely(function: () -> Unit) {
                 function()
