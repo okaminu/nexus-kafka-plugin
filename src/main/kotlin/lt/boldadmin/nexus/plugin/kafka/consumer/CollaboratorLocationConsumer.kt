@@ -16,13 +16,13 @@ class CollaboratorLocationConsumer(
 ) {
     fun consumeCoordinates() = consumer.consume<Pair<String, Coordinates>>(
         "collaborator-location-update-by-coordinates",
-        { coordinatesSubscribers.forEach { subscriber -> subscriber.notify(it.first, it.second) }},
+        { coordinatesSubscribers.forEach { subscriber -> subscriber.notify(it.first, it.second) } },
         consumerPropertiesFactory.create(CollaboratorCoordinatesDeserializer::class.java)
     )
 
     fun consumeMessages() = consumer.consume<Message>(
         "collaborator-location-update-by-message",
-        { messageSubscribers.forEach { subscriber -> subscriber.notify(it) }},
+        { messageSubscribers.forEach { subscriber -> subscriber.notify(it) } },
         consumerPropertiesFactory.create(CollaboratorMessageDeserializer::class.java)
     )
 }

@@ -67,7 +67,7 @@ class ConsumerTest {
         every { consumerFactoryStub.create<String>(any()) } returns kafkaConsumerSpy
         every { kafkaConsumerSpy.poll(any<Duration>()) } returns createConsumerRecords(expectedValues)
 
-        consumer.consume<String>("topic", { actualValues.add(it)}, Properties())
+        consumer.consume<String>("topic", { actualValues.add(it) }, Properties())
 
         assertEquals(expectedValues, actualValues)
     }

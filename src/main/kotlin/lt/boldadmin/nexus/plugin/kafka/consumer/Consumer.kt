@@ -6,7 +6,7 @@ import java.util.*
 
 open class Consumer(private val consumerFactory: KafkaConsumerFactory) {
 
-    fun <T>consume(topic: String, function: (T) -> Unit, properties: Properties) {
+    fun <T> consume(topic: String, function: (T) -> Unit, properties: Properties) {
         val consumer = consumerFactory.create<T>(properties)
         consumer.subscribe(listOf(topic))
 

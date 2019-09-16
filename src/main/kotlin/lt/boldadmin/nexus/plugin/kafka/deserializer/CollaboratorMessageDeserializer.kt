@@ -7,8 +7,4 @@ import org.apache.kafka.common.serialization.Deserializer
 class CollaboratorMessageDeserializer: Deserializer<Message> {
     override fun deserialize(topic: String?, data: ByteArray?): Message =
         jacksonObjectMapper().readValue(data, Message::class.java)
-
-    override fun close() {}
-
-    override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {}
 }

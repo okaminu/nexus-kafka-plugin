@@ -7,8 +7,4 @@ import org.apache.kafka.common.serialization.Serializer
 class CollaboratorMessageSerializer: Serializer<Message> {
     override fun serialize(topic: String?, message: Message?): ByteArray =
         jacksonObjectMapper().writeValueAsBytes(message)
-
-    override fun close() {}
-
-    override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {}
 }

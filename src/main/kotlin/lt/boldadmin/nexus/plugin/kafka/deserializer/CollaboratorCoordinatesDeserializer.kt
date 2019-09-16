@@ -8,8 +8,4 @@ import org.apache.kafka.common.serialization.Deserializer
 class CollaboratorCoordinatesDeserializer: Deserializer<Pair<String, Coordinates>> {
     override fun deserialize(topic: String?, data: ByteArray?): Pair<String, Coordinates> =
         jacksonObjectMapper().readValue(data, object : TypeReference<Pair<String, Coordinates>>() {})
-
-    override fun close() {}
-
-    override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {}
 }
