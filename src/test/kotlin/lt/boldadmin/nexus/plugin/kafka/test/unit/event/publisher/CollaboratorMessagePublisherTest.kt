@@ -5,12 +5,10 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import lt.boldadmin.nexus.api.type.valueobject.Coordinates
 import lt.boldadmin.nexus.api.type.valueobject.Message
-import lt.boldadmin.nexus.plugin.kafka.event.publisher.CollaboratorLocationPublisher
+import lt.boldadmin.nexus.plugin.kafka.event.publisher.CollaboratorMessagePublisher
 import lt.boldadmin.nexus.plugin.kafka.factory.KafkaProducerFactory
 import lt.boldadmin.nexus.plugin.kafka.factory.ProducerPropertiesFactory
-import lt.boldadmin.nexus.plugin.kafka.serializer.CollaboratorCoordinatesSerializer
 import lt.boldadmin.nexus.plugin.kafka.serializer.CollaboratorMessageSerializer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -19,7 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
-class CollaboratorLocationPublisherTest {
+class CollaboratorMessagePublisherTest {
 
     @MockK
     private lateinit var producerPropertiesFactory: ProducerPropertiesFactory
@@ -28,28 +26,7 @@ class CollaboratorLocationPublisherTest {
     private lateinit var factorySpy: KafkaProducerFactory
 
     @Test
-    fun `Updates collaborator location by coordinates`() {
-        val properties = Properties()
-        val collaboratorId = "collaboratorId"
-        val coordinates = Coordinates(123.0, 123.0)
-        val producerSpy: KafkaProducer<String, Pair<String, Coordinates>> = mockk()
-        every { factorySpy.create<Pair<String, Coordinates>>(properties) } returns producerSpy
-        every { producerPropertiesFactory.create(CollaboratorCoordinatesSerializer::class.java) } returns properties
-        every { producerSpy.send(any()) } returns mockk()
-
-        CollaboratorLocationPublisher(
-            factorySpy,
-            producerPropertiesFactory
-        ).publish(collaboratorId, coordinates)
-
-        val collaboratorCoordinates = Pair(collaboratorId, coordinates)
-        verify {
-            producerSpy.send(eq(ProducerRecord("collaborator-location-update-by-coordinates", collaboratorCoordinates)))
-        }
-    }
-
-    @Test
-    fun `Updates collaborator location by message`() {
+    fun `Publishes collaborator message`() {
         val properties = Properties()
         val producerSpy: KafkaProducer<String, Message> = mockk()
         val message = Message("123", "86099999", "projectName")
@@ -57,7 +34,7 @@ class CollaboratorLocationPublisherTest {
         every { producerPropertiesFactory.create(CollaboratorMessageSerializer::class.java) } returns properties
         every { producerSpy.send(any()) } returns mockk()
 
-        CollaboratorLocationPublisher(
+        CollaboratorMessagePublisher(
             factorySpy,
             producerPropertiesFactory
         ).publish(message)

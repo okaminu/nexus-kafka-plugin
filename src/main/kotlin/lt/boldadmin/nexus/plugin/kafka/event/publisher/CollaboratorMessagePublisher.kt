@@ -1,24 +1,16 @@
 package lt.boldadmin.nexus.plugin.kafka.event.publisher
 
-import lt.boldadmin.nexus.api.event.publisher.CollaboratorLocationPublisher
-import lt.boldadmin.nexus.api.type.valueobject.Coordinates
+import lt.boldadmin.nexus.api.event.publisher.CollaboratorMessagePublisher
 import lt.boldadmin.nexus.api.type.valueobject.Message
 import lt.boldadmin.nexus.plugin.kafka.factory.KafkaProducerFactory
 import lt.boldadmin.nexus.plugin.kafka.factory.ProducerPropertiesFactory
-import lt.boldadmin.nexus.plugin.kafka.serializer.CollaboratorCoordinatesSerializer
 import lt.boldadmin.nexus.plugin.kafka.serializer.CollaboratorMessageSerializer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-class CollaboratorLocationPublisher(
+class CollaboratorMessagePublisher(
     private val producerFactory: KafkaProducerFactory,
     private val producerPropertiesFactory: ProducerPropertiesFactory
-): CollaboratorLocationPublisher {
-
-    override fun publish(collaboratorId: String, coordinates: Coordinates) {
-        val properties = producerPropertiesFactory.create(CollaboratorCoordinatesSerializer::class.java)
-        val producer = producerFactory.create<Pair<String, Coordinates>>(properties)
-        producer.send(ProducerRecord("collaborator-location-update-by-coordinates", Pair(collaboratorId, coordinates)))
-    }
+): CollaboratorMessagePublisher {
 
     override fun publish(message: Message) {
         val properties = producerPropertiesFactory.create(CollaboratorMessageSerializer::class.java)
