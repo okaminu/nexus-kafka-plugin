@@ -39,6 +39,6 @@ class CollaboratorMessagePublisherTest {
             producerPropertiesFactory
         ).publish(message)
 
-        verify { producerSpy.send(eq(ProducerRecord("collaborator-location-update-by-message", message))) }
+        verify { producerSpy.send(eq(ProducerRecord("collaborator-message", message))) }
     }
 }

@@ -15,6 +15,6 @@ class CollaboratorMessagePublisher(
     override fun publish(message: Message) {
         val properties = producerPropertiesFactory.create(CollaboratorMessageSerializer::class.java)
         val producer = producerFactory.create<Message>(properties)
-        producer.send(ProducerRecord("collaborator-location-update-by-message", message))
+        producer.send(ProducerRecord("collaborator-message", message))
     }
 }
