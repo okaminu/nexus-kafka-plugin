@@ -5,4 +5,4 @@ This plugin implements the event package of nexus-api in order to adapt subscrip
 
 Environment variables:
 
-KAFKA_SERVER_URL - address and port of kafka server
+KAFKA_SERVER_URL - address and port of Kafka server
