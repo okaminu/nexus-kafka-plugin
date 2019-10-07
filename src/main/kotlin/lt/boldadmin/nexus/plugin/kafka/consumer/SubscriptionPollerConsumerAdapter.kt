@@ -2,14 +2,18 @@ package lt.boldadmin.nexus.plugin.kafka.consumer
 
 import lt.boldadmin.nexus.api.event.SubscriptionPoller
 
-class SubscriptionPollerConsumerAdapter(
+open class SubscriptionPollerConsumerAdapter(
     private val locationConsumer: CollaboratorLocationConsumer,
     private val messageConsumer: CollaboratorMessageConsumer
 ): SubscriptionPoller {
 
-    override fun pollInNewThread() {
-        Thread { run { locationConsumer.consumeCoordinates() } }.start()
-        Thread { run { locationConsumer.consumerAbsent() } }.start()
-        Thread { run { messageConsumer.consumeMessages() } }.start()
+    final override fun pollInNewThread() {
+        runInThread { locationConsumer.consumeCoordinates() }
+        runInThread { locationConsumer.consumerAbsent() }
+        runInThread { messageConsumer.consumeMessages() }
+    }
+
+    open fun runInThread(function: () -> Unit) {
+        Thread { run { function() } }.start()
     }
 }

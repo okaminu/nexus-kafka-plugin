@@ -28,7 +28,9 @@ class SubscriptionPollerConsumerAdapterTest {
         every { locationConsumerSpy.consumerAbsent() } returns Unit
         every { messageConsumerSpy.consumeMessages() } returns Unit
 
-        subscriptionPoller = SubscriptionPollerConsumerAdapter(locationConsumerSpy, messageConsumerSpy)
+        subscriptionPoller = object: SubscriptionPollerConsumerAdapter(locationConsumerSpy, messageConsumerSpy) {
+            override fun runInThread(function: () -> Unit) { function() }
+        }
     }
 
     @Test
