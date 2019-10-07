@@ -16,7 +16,7 @@ open class Consumer(
 
         executeInfinitely {
             consumer.poll(ofSeconds(1)).forEach {
-                logException( { function(it.value()) }, topic)
+                logException({ function(it.value()) }, topic)
             }
         }
     }

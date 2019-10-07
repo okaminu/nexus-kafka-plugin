@@ -1,5 +1,7 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <Whitelist>
+    <ID>TooGenericExceptionCaught:Consumer.kt$Consumer$ex: Exception</ID>
+    <ID>TooGenericExceptionThrown:ConsumerTest.kt$ConsumerTest$throw Exception("message")</ID>
   </Whitelist>
 </SmellBaseline>
