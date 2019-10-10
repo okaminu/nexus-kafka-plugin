@@ -6,7 +6,7 @@ import lt.boldadmin.nexus.plugin.kafka.deserializer.CollaboratorCoordinatesDeser
 import lt.boldadmin.nexus.plugin.kafka.factory.ConsumerPropertiesFactory
 import org.apache.kafka.common.serialization.StringDeserializer
 
-class CollaboratorLocationConsumer(
+class CollaboratorCoordinatesConsumer(
     private val consumerPropertiesFactory: ConsumerPropertiesFactory,
     private val consumer: Consumer,
     private val coordinatesSubscribers: Collection<CollaboratorCoordinatesSubscriber> = listOf()
@@ -17,7 +17,7 @@ class CollaboratorLocationConsumer(
         consumerPropertiesFactory.create(CollaboratorCoordinatesDeserializer::class.java)
     )
 
-    fun consumerAbsent() = consumer.consume<String>(
+    fun consumeAbsent() = consumer.consume<String>(
         "collaborator-coordinates-absent",
         { coordinatesSubscribers.forEach { subscriber -> subscriber.notifyAbsent(it) } },
         consumerPropertiesFactory.create(StringDeserializer::class.java)

@@ -20,25 +20,24 @@ import java.util.*
 class CollaboratorMessagePublisherTest {
 
     @MockK
-    private lateinit var producerPropertiesFactory: ProducerPropertiesFactory
+    private lateinit var propertiesFactoryStub: ProducerPropertiesFactory
 
     @MockK
-    private lateinit var factorySpy: KafkaProducerFactory
+    private lateinit var producerFactoryStub: KafkaProducerFactory
+
+    @MockK
+    private lateinit var producerSpy: KafkaProducer<String, Message>
 
     @Test
     fun `Publishes collaborator message`() {
         val properties = Properties()
-        val producerSpy: KafkaProducer<String, Message> = mockk()
         val message = Message("123", "86099999", "projectName")
-        every { factorySpy.create<Message>(properties) } returns producerSpy
-        every { producerPropertiesFactory.create(CollaboratorMessageSerializer::class.java) } returns properties
+        every { producerFactoryStub.create<Message>(properties) } returns producerSpy
+        every { propertiesFactoryStub.create(CollaboratorMessageSerializer::class.java) } returns properties
         every { producerSpy.send(any()) } returns mockk()
 
-        CollaboratorMessagePublisher(
-            factorySpy,
-            producerPropertiesFactory
-        ).publish(message)
+        CollaboratorMessagePublisher(producerFactoryStub, propertiesFactoryStub).publish(message)
 
-        verify { producerSpy.send(eq(ProducerRecord("collaborator-message", message))) }
+        verify { producerSpy.send(ProducerRecord("collaborator-message", message)) }
     }
 }

@@ -5,17 +5,18 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import lt.boldadmin.nexus.api.event.subscriber.CollaboratorCoordinatesSubscriber
 import lt.boldadmin.nexus.api.type.valueobject.Coordinates
-import lt.boldadmin.nexus.plugin.kafka.consumer.CollaboratorLocationConsumer
+import lt.boldadmin.nexus.plugin.kafka.consumer.CollaboratorCoordinatesConsumer
 import lt.boldadmin.nexus.plugin.kafka.consumer.Consumer
 import lt.boldadmin.nexus.plugin.kafka.deserializer.CollaboratorCoordinatesDeserializer
 import lt.boldadmin.nexus.plugin.kafka.factory.ConsumerPropertiesFactory
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
-class CollaboratorLocationConsumerTest {
+class CollaboratorCoordinatesConsumerTest {
 
     @MockK
     private lateinit var consumerPropertiesFactoryStub: ConsumerPropertiesFactory
@@ -26,12 +27,11 @@ class CollaboratorLocationConsumerTest {
     @MockK
     private lateinit var coordinatesSubscriberSpy: CollaboratorCoordinatesSubscriber
 
-    private lateinit var consumer: CollaboratorLocationConsumer
+    private lateinit var consumer: CollaboratorCoordinatesConsumer
 
     @BeforeEach
-    fun setUp() {
-        MockKAnnotations.init(this)
-        consumer = CollaboratorLocationConsumer(
+    fun `Set up`() {
+        consumer = CollaboratorCoordinatesConsumer(
             consumerPropertiesFactoryStub,
             consumerSpy,
             listOf(coordinatesSubscriberSpy, coordinatesSubscriberSpy)
@@ -39,19 +39,35 @@ class CollaboratorLocationConsumerTest {
     }
 
     @Test
-    fun `Notifies subscribers on collaborator coordinates update `() {
+    fun `Notifies subscribers on collaborator coordinates update`() {
         val subscribedFunction = slot<(Pair<String, Coordinates>) -> Unit>()
         val coordinates = Coordinates(1.0, 1.0)
-        val collaboratorId = "123456"
-        every { consumerSpy.consume(any(), capture(subscribedFunction), any()) } returns Unit
-        every { coordinatesSubscriberSpy.notify(collaboratorId, coordinates) } returns Unit
+        every { consumerSpy.consume("collaborator-coordinates-update", capture(subscribedFunction), any()) } just Runs
+        every { coordinatesSubscriberSpy.notify("collabId", coordinates) } just Runs
         every {
             consumerPropertiesFactoryStub.create(CollaboratorCoordinatesDeserializer::class.java)
         } returns Properties()
 
         consumer.consumeCoordinates()
-        subscribedFunction.captured(Pair(collaboratorId, coordinates))
+        subscribedFunction.captured(Pair("collabId", coordinates))
 
-        verify(exactly = 2) { coordinatesSubscriberSpy.notify(collaboratorId, coordinates) }
+        verify(exactly = 2) { coordinatesSubscriberSpy.notify("collabId", coordinates) }
     }
+
+    @Test
+    fun `Notifies subscribers on collaborator coordinates absent`() {
+        val subscribedFunction = slot<(String) -> Unit>()
+        val collaboratorId = "123456"
+        every { consumerSpy.consume("collaborator-coordinates-absent", capture(subscribedFunction), any()) } just Runs
+        every { coordinatesSubscriberSpy.notifyAbsent(collaboratorId) } just Runs
+        every {
+            consumerPropertiesFactoryStub.create(StringDeserializer::class.java)
+        } returns Properties()
+
+        consumer.consumeAbsent()
+        subscribedFunction.captured(collaboratorId)
+
+        verify(exactly = 2) { coordinatesSubscriberSpy.notifyAbsent(collaboratorId) }
+    }
+
 }

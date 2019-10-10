@@ -1,10 +1,8 @@
 package lt.boldadmin.nexus.plugin.kafka.test.unit.consumer
 
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.mockk
-import io.mockk.verify
 import lt.boldadmin.nexus.plugin.kafka.consumer.Consumer
 import lt.boldadmin.nexus.plugin.kafka.factory.KafkaConsumerFactory
 import lt.boldadmin.nexus.plugin.kafka.factory.LoggerFactory
@@ -37,13 +35,13 @@ class ConsumerTest {
     private lateinit var consumer: Consumer
 
     @BeforeEach
-    fun setUp() {
+    fun `Set up`() {
         consumer = object: Consumer(consumerFactoryStub, loggerFactorySpy) {
             override fun executeInfinitely(function: () -> Unit) {
                 function()
             }
         }
-        every { kafkaConsumerSpy.subscribe(any<Collection<String>>()) } returns Unit
+        every { kafkaConsumerSpy.subscribe(any<Collection<String>>()) } just Runs
         every { consumerFactoryStub.create<String>(any()) } returns kafkaConsumerSpy
     }
 
@@ -107,6 +105,6 @@ class ConsumerTest {
 
     private fun createConsumerRecords(values : Collection<String>): ConsumerRecords<String, String> {
         val records = values.map { ConsumerRecord("", 0, 0, "", it) }.toList()
-        return ConsumerRecords<String, String>(mutableMapOf(TopicPartition("", 0) to records))
+        return ConsumerRecords(mutableMapOf(TopicPartition("", 0) to records))
     }
 }

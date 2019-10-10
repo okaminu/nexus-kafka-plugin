@@ -29,8 +29,7 @@ class CollaboratorMessageConsumerTest {
     private lateinit var consumer: CollaboratorMessageConsumer
 
     @BeforeEach
-    fun setUp() {
-        MockKAnnotations.init(this)
+    fun `Set up`() {
         consumer = CollaboratorMessageConsumer(
             consumerPropertiesFactoryStub,
             consumerSpy,
@@ -43,8 +42,8 @@ class CollaboratorMessageConsumerTest {
         val subscribedFunction = slot<(Message) -> Unit>()
         val message = Message("123", "333", "@project")
         every { consumerPropertiesFactoryStub.create(CollaboratorMessageDeserializer::class.java) } returns Properties()
-        every { consumerSpy.consume(any(), capture(subscribedFunction), any()) } returns Unit
-        every { messageSubscribersSpy.notify(message) } returns Unit
+        every { consumerSpy.consume(any(), capture(subscribedFunction), any()) } just Runs
+        every { messageSubscribersSpy.notify(message) } just Runs
 
         consumer.consumeMessages()
         subscribedFunction.captured(message)

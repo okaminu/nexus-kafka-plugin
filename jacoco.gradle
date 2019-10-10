@@ -3,7 +3,11 @@ jacoco {
     toolVersion = "0.8.3"
 }
 
-def fileFilter = []
+def fileFilter = [
+        '**/*$*$*.*', '**/KafkaConsumerFactory.*', '**/KafkaProducerFactory.*', '**/KafkaServerAddressProvider.*',
+        '**/LoggerFactory.*', 'lt/boldadmin/nexus/plugin/kafka/deserializer/*',
+        'lt/boldadmin/nexus/plugin/kafka/serializer/*', '**/*Exception.*'
+]
 def debugTree = fileTree(dir: "${buildDir}/classes/kotlin/main", excludes: fileFilter)
 
 jacocoTestReport {
