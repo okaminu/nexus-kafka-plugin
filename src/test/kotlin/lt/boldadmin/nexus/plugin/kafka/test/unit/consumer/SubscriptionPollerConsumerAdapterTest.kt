@@ -67,5 +67,6 @@ class SubscriptionPollerConsumerAdapterTest {
         val executorService = poller.create()
 
         assertNotNull(executorService)
+        executorService.shutdown()
     }
 }
