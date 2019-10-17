@@ -46,7 +46,7 @@ class CollaboratorCoordinatesPublisherTest {
         publisher.publish("collaboratorId", coordinates)
 
         verify {
-            producerSpy.send(eq(ProducerRecord("collaborator-coordinates-update", Pair("collaboratorId", coordinates))))
+            producerSpy.send(ProducerRecord("collaborator-coordinates-update", Pair("collaboratorId", coordinates)))
         }
     }
 
@@ -61,7 +61,7 @@ class CollaboratorCoordinatesPublisherTest {
         publisher.publishAbsent("collaboratorId")
 
         verify {
-            producerSpy.send(eq(ProducerRecord("collaborator-coordinates-absent", "collaboratorId")))
+            producerSpy.send(ProducerRecord("collaborator-coordinates-absent", "collaboratorId"))
         }
     }
 }
