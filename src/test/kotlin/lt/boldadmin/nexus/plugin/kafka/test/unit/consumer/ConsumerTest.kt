@@ -89,7 +89,7 @@ class ConsumerTest {
     }
 
     @Test
-    fun `Logs exception and it's message`() {
+    fun `Logs exception and its message`() {
         every { kafkaConsumerSpy.poll(any<Duration>()) } returns createConsumerRecords(listOf("data"))
         val loggerSpy: Logger = mockk()
         every { loggerSpy.error(any(), any<Exception>()) } returns Unit
