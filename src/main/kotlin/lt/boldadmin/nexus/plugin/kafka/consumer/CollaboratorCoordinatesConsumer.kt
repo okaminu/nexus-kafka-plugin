@@ -11,15 +11,19 @@ class CollaboratorCoordinatesConsumer(
     private val consumer: Consumer,
     private val coordinatesSubscribers: Collection<CollaboratorCoordinatesSubscriber> = listOf()
 ) {
-    fun consumeCoordinates() = consumer.consume<Pair<String, Coordinates>>(
+    fun consumeCoordinates() = consumer.consume(
         "collaborator-coordinates-update",
-        { coordinatesSubscribers.forEach { subscriber -> subscriber.notify(it.first, it.second) } },
+        coordinatesSubscribers.map { it.toFunction() },
         consumerPropertiesFactory.create(CollaboratorCoordinatesDeserializer::class.java)
     )
 
-    fun consumeAbsent() = consumer.consume<String>(
+    fun consumeAbsent() = consumer.consume(
         "collaborator-coordinates-absent",
-        { coordinatesSubscribers.forEach { subscriber -> subscriber.notifyAbsent(it) } },
+        coordinatesSubscribers.map { subscriber -> { id: String -> subscriber.notifyAbsent(id) } },
         consumerPropertiesFactory.create(StringDeserializer::class.java)
     )
+
+    private fun CollaboratorCoordinatesSubscriber.toFunction() = {
+        pair: Pair<String, Coordinates> -> this.notify(pair.first, pair.second)
+    }
 }

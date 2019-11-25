@@ -40,32 +40,34 @@ class CollaboratorCoordinatesConsumerTest {
 
     @Test
     fun `Notifies subscribers on collaborator coordinates update`() {
-        val subscribedFunction = slot<(Pair<String, Coordinates>) -> Unit>()
         val coordinates = Coordinates(1.0, 1.0)
-        every { consumerSpy.consume("collaborator-coordinates-update", capture(subscribedFunction), any()) } just Runs
+        val subscribedFunctions = slot<Collection<(Pair<String, Coordinates>) -> Unit>>()
+        every { consumerSpy.consume("collaborator-coordinates-update", capture(subscribedFunctions), any()) } just Runs
         every { coordinatesSubscriberSpy.notify("collabId", coordinates) } just Runs
         every {
             consumerPropertiesFactoryStub.create(CollaboratorCoordinatesDeserializer::class.java)
         } returns Properties()
 
         consumer.consumeCoordinates()
-        subscribedFunction.captured(Pair("collabId", coordinates))
+        subscribedFunctions.captured.forEach { it(Pair("collabId", coordinates)) }
 
         verify(exactly = 2) { coordinatesSubscriberSpy.notify("collabId", coordinates) }
     }
 
     @Test
     fun `Notifies subscribers on collaborator coordinates absent`() {
-        val subscribedFunction = slot<(String) -> Unit>()
+        val subscribedFunctions = slot<Collection<(String) -> Unit>>()
         val collaboratorId = "123456"
-        every { consumerSpy.consume("collaborator-coordinates-absent", capture(subscribedFunction), any()) } just Runs
+        every {
+            consumerSpy.consume("collaborator-coordinates-absent", capture(subscribedFunctions), any())
+        } just Runs
         every { coordinatesSubscriberSpy.notifyAbsent(collaboratorId) } just Runs
         every {
             consumerPropertiesFactoryStub.create(StringDeserializer::class.java)
         } returns Properties()
 
         consumer.consumeAbsent()
-        subscribedFunction.captured(collaboratorId)
+        subscribedFunctions.captured.forEach { it(collaboratorId) }
 
         verify(exactly = 2) { coordinatesSubscriberSpy.notifyAbsent(collaboratorId) }
     }

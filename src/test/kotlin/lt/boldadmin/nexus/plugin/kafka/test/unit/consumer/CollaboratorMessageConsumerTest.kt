@@ -39,15 +39,15 @@ class CollaboratorMessageConsumerTest {
 
     @Test
     fun `Notifies subscribers on collaborator message event`() {
-        val subscribedFunction = slot<(Message) -> Unit>()
-        val message = Message("123", "333", "@project")
+        val expectedMessage = Message("123", "333", "@project")
+        val subscribedFunctions = slot<Collection<(Message) -> Unit>>()
         every { consumerPropertiesFactoryStub.create(CollaboratorMessageDeserializer::class.java) } returns Properties()
-        every { consumerSpy.consume(any(), capture(subscribedFunction), any()) } just Runs
-        every { messageSubscribersSpy.notify(message) } just Runs
+        every { consumerSpy.consume("collaborator-message", capture(subscribedFunctions), any()) } just Runs
+        every { messageSubscribersSpy.notify(expectedMessage) } just Runs
 
         consumer.consumeMessages()
-        subscribedFunction.captured(message)
+        subscribedFunctions.captured.forEach { it(expectedMessage) }
 
-        verify(exactly = 2) { messageSubscribersSpy.notify(message) }
+        verify(exactly = 2) { messageSubscribersSpy.notify(expectedMessage) }
     }
 }
