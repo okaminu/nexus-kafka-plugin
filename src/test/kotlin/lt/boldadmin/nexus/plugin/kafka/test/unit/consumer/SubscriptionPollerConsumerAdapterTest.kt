@@ -6,7 +6,6 @@ import io.mockk.junit5.MockKExtension
 import lt.boldadmin.nexus.plugin.kafka.consumer.CollaboratorCoordinatesConsumer
 import lt.boldadmin.nexus.plugin.kafka.consumer.CollaboratorMessageConsumer
 import lt.boldadmin.nexus.plugin.kafka.consumer.SubscriptionPollerConsumerAdapter
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -44,29 +43,19 @@ class SubscriptionPollerConsumerAdapterTest {
 
     @Test
     fun `Polls consumers for message events`() {
-        subscriptionPoller.pollInNewThread()
+        subscriptionPoller.poll()
         verify { messageConsumerSpy.consumeMessages() }
     }
 
     @Test
     fun `Polls consumers for coordinate update events`() {
-        subscriptionPoller.pollInNewThread()
+        subscriptionPoller.poll()
         verify { coordinatesConsumerSpy.consumeCoordinates() }
     }
 
     @Test
     fun `Polls consumers for coordinate absence events`() {
-        subscriptionPoller.pollInNewThread()
+        subscriptionPoller.poll()
         verify { coordinatesConsumerSpy.consumeAbsent() }
-    }
-
-    @Test
-    fun `Creates Executor Service`() {
-        val poller = SubscriptionPollerConsumerAdapter(coordinatesConsumerSpy, messageConsumerSpy)
-
-        val executorService = poller.create()
-
-        assertNotNull(executorService)
-        executorService.shutdown()
     }
 }

@@ -9,7 +9,7 @@ open class SubscriptionPollerConsumerAdapter(
     private val messageConsumer: CollaboratorMessageConsumer
 ): SubscriptionPoller {
 
-    final override fun pollInNewThread() {
+    final override fun poll() {
         create().apply {
             submit { coordinatesConsumer.consumeAbsent() }
             submit { coordinatesConsumer.consumeCoordinates() }
@@ -17,5 +17,5 @@ open class SubscriptionPollerConsumerAdapter(
         }
     }
 
-    open fun create(): ExecutorService = Executors.newFixedThreadPool(3)
+    protected open fun create(): ExecutorService = Executors.newFixedThreadPool(3)
 }

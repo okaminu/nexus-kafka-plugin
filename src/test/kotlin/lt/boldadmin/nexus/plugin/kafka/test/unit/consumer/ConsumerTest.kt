@@ -19,6 +19,7 @@ import org.slf4j.Logger
 import java.time.Duration
 import java.time.Duration.ofSeconds
 import java.util.*
+import java.util.concurrent.ExecutorService
 
 @ExtendWith(MockKExtension::class)
 class ConsumerTest {
@@ -39,6 +40,16 @@ class ConsumerTest {
         consumer = object: Consumer(consumerFactoryStub, loggerFactorySpy) {
             override fun executeInfinitely(function: () -> Unit) {
                 function()
+            }
+
+            override fun create(): ExecutorService {
+                val slot = slot<Runnable>()
+                return mockk<ExecutorService>().apply {
+                    every { submit(capture(slot)) } answers {
+                        slot.captured.run()
+                        mockk()
+                    }
+                }
             }
         }
         every { kafkaConsumerSpy.subscribe(any<Collection<String>>()) } just Runs
