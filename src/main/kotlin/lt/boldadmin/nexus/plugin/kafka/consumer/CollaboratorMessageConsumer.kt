@@ -10,9 +10,9 @@ class CollaboratorMessageConsumer(
     private val consumer: Consumer,
     private val messageSubscribers: Collection<CollaboratorMessageSubscriber> = listOf()
 ) {
-    fun consumeMessages() = consumer.consume<Message>(
+    fun consumeMessages() = consumer.consume(
         "collaborator-message",
-        { messageSubscribers.forEach { subscriber -> subscriber.notify(it) } },
+        messageSubscribers.map { subscriber -> { m: Message -> subscriber.notify(m) } },
         consumerPropertiesFactory.create(CollaboratorMessageDeserializer::class.java)
     )
 }

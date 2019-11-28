@@ -10,8 +10,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -19,6 +18,7 @@ import org.slf4j.Logger
 import java.time.Duration
 import java.time.Duration.ofSeconds
 import java.util.*
+import java.util.concurrent.ExecutorService
 
 @ExtendWith(MockKExtension::class)
 class ConsumerTest {
@@ -40,6 +40,16 @@ class ConsumerTest {
             override fun executeInfinitely(function: () -> Unit) {
                 function()
             }
+
+            override fun create(): ExecutorService {
+                val slot = slot<Runnable>()
+                return mockk<ExecutorService>().apply {
+                    every { submit(capture(slot)) } answers {
+                        slot.captured.run()
+                        mockk()
+                    }
+                }
+            }
         }
         every { kafkaConsumerSpy.subscribe(any<Collection<String>>()) } just Runs
         every { consumerFactoryStub.create<String>(any()) } returns kafkaConsumerSpy
@@ -50,7 +60,7 @@ class ConsumerTest {
         val properties = Properties()
         every { kafkaConsumerSpy.poll(any<Duration>()) } returns createConsumerRecords(emptyList())
 
-        consumer.consume<String>("topic", {}, properties)
+        consumer.consume<String>("topic", emptyList(), properties)
 
         verify { kafkaConsumerSpy.subscribe(listOf("topic")) }
     }
@@ -59,27 +69,39 @@ class ConsumerTest {
     fun `Polls for events each second`() {
         every { kafkaConsumerSpy.poll(any<Duration>()) } returns createConsumerRecords(emptyList())
 
-        consumer.consume<String>("topic", {}, Properties())
+        consumer.consume<String>("topic", emptyList(), Properties())
 
         verify { kafkaConsumerSpy.poll(ofSeconds(1)) }
     }
 
     @Test
-    fun `Executes subscription function with event data`() {
+    fun `Provides all events to subscription function`() {
         val actualValues = mutableListOf<String>()
         val expectedValues = listOf("hello1", "hello2")
         every { kafkaConsumerSpy.poll(any<Duration>()) } returns createConsumerRecords(expectedValues)
 
-        consumer.consume<String>("topic", { actualValues.add(it) }, Properties())
+        consumer.consume<String>("topic", listOf { it -> actualValues.add(it) }, Properties())
 
         assertEquals(expectedValues, actualValues)
+    }
+
+    @Test
+    fun `Provides event to all subscription functions`() {
+        val actualValues = mutableListOf<String>()
+        val subscriptionFunction: (String) -> Unit = { actualValues.add(it) }
+        every { kafkaConsumerSpy.poll(any<Duration>()) } returns createConsumerRecords(listOf("hello"))
+
+        consumer.consume("topic", listOf(subscriptionFunction, subscriptionFunction), Properties())
+
+        assertEquals(listOf("hello", "hello"), actualValues)
     }
 
     @Test
     fun `Executes polling infinitely`() {
         every { kafkaConsumerSpy.poll(any<Duration>()) } returns createConsumerRecords(emptyList())
 
-        Thread { run { Consumer(consumerFactoryStub, loggerFactorySpy).consume<String>("topic", {}, Properties()) } }
+        val consumer = Consumer(consumerFactoryStub, loggerFactorySpy)
+        Thread { run { consumer.consume<String>("topic", emptyList(), Properties()) } }
             .apply {
                 start()
                 join(100)
@@ -95,12 +117,22 @@ class ConsumerTest {
         every { loggerSpy.error(any(), any<Exception>()) } returns Unit
         every { loggerFactorySpy.create(Consumer::class.java) } returns loggerSpy
 
-        consumer.consume<String>("topic", { throw Exception("message") }, Properties())
+        consumer.consume<String>("topic", listOf { _ -> throw Exception("message") }, Properties())
 
         val capturedArgs = mutableListOf<String>()
         verify { loggerSpy.error(capture(capturedArgs), any<Exception>()) }
         assertTrue(capturedArgs.single().contains("message"))
         assertTrue(capturedArgs.single().contains("topic"))
+    }
+
+    @Test
+    fun `Creates Executor Service`() {
+        val consumer = Consumer(mockk(), mockk())
+
+        val executorService = consumer.create()
+
+        assertNotNull(executorService)
+        executorService.shutdown()
     }
 
     private fun createConsumerRecords(values : Collection<String>): ConsumerRecords<String, String> {
