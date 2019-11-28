@@ -17,5 +17,5 @@ open class SubscriptionPollerConsumerAdapter(
         }
     }
 
-    protected open fun create(): ExecutorService = Executors.newFixedThreadPool(3)
+    internal open fun create(): ExecutorService = Executors.newFixedThreadPool(3)
 }

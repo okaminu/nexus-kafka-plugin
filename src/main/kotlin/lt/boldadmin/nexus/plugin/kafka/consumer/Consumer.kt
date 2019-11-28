@@ -26,7 +26,7 @@ open class Consumer(
         while (true) function()
     }
 
-    protected open fun create(): ExecutorService = Executors.newFixedThreadPool(8)
+    internal open fun create(): ExecutorService = Executors.newFixedThreadPool(8)
 
     private fun <T> consume(topic: String, functions: Collection<(T) -> Unit>, record: ConsumerRecord<String, T>) {
         create().apply {

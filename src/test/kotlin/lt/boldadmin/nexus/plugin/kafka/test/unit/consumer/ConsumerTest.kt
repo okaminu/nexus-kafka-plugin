@@ -10,8 +10,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -101,7 +100,8 @@ class ConsumerTest {
     fun `Executes polling infinitely`() {
         every { kafkaConsumerSpy.poll(any<Duration>()) } returns createConsumerRecords(emptyList())
 
-        Thread { run { Consumer(consumerFactoryStub, loggerFactorySpy).consume<String>("topic", emptyList(), Properties()) } }
+        val consumer = Consumer(consumerFactoryStub, loggerFactorySpy)
+        Thread { run { consumer.consume<String>("topic", emptyList(), Properties()) } }
             .apply {
                 start()
                 join(100)
@@ -123,6 +123,16 @@ class ConsumerTest {
         verify { loggerSpy.error(capture(capturedArgs), any<Exception>()) }
         assertTrue(capturedArgs.single().contains("message"))
         assertTrue(capturedArgs.single().contains("topic"))
+    }
+
+    @Test
+    fun `Creates Executor Service`() {
+        val consumer = Consumer(mockk(), mockk())
+
+        val executorService = consumer.create()
+
+        assertNotNull(executorService)
+        executorService.shutdown()
     }
 
     private fun createConsumerRecords(values : Collection<String>): ConsumerRecords<String, String> {
