@@ -44,19 +44,19 @@ class SubscriptionPollerConsumerAdapterTest {
 
     @Test
     fun `Polls consumers for message events`() {
-        subscriptionPoller.pollInNewThread()
+        subscriptionPoller.poll()
         verify { messageConsumerSpy.consumeMessages() }
     }
 
     @Test
     fun `Polls consumers for coordinate update events`() {
-        subscriptionPoller.pollInNewThread()
+        subscriptionPoller.poll()
         verify { coordinatesConsumerSpy.consumeCoordinates() }
     }
 
     @Test
     fun `Polls consumers for coordinate absence events`() {
-        subscriptionPoller.pollInNewThread()
+        subscriptionPoller.poll()
         verify { coordinatesConsumerSpy.consumeAbsent() }
     }
 
