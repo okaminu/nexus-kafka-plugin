@@ -6,7 +6,6 @@ import io.mockk.junit5.MockKExtension
 import lt.boldadmin.nexus.plugin.kafka.consumer.CollaboratorCoordinatesConsumer
 import lt.boldadmin.nexus.plugin.kafka.consumer.CollaboratorMessageConsumer
 import lt.boldadmin.nexus.plugin.kafka.consumer.SubscriptionPollerConsumerAdapter
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,24 +20,27 @@ class SubscriptionPollerConsumerAdapterTest {
     @MockK
     private lateinit var messageConsumerSpy: CollaboratorMessageConsumer
 
+    @MockK
+    private lateinit var executorServiceStub: ExecutorService
+
     private lateinit var subscriptionPoller: SubscriptionPollerConsumerAdapter
 
     @BeforeEach
     fun `Set Up`() {
+        subscriptionPoller = SubscriptionPollerConsumerAdapter(
+            coordinatesConsumerSpy,
+            messageConsumerSpy,
+            executorServiceStub
+        )
+
         every { coordinatesConsumerSpy.consumeCoordinates() } just Runs
         every { coordinatesConsumerSpy.consumeAbsent() } just Runs
         every { messageConsumerSpy.consumeMessages() } just Runs
 
-        subscriptionPoller = object: SubscriptionPollerConsumerAdapter(coordinatesConsumerSpy, messageConsumerSpy) {
-            override fun create(): ExecutorService {
-                val slot = slot<Runnable>()
-                return mockk<ExecutorService>().apply {
-                    every { submit(capture(slot)) } answers {
-                        slot.captured.run()
-                        mockk()
-                    }
-                }
-            }
+        val slot = slot<Runnable>()
+        every { executorServiceStub.submit(capture(slot)) } answers {
+            slot.captured.run()
+            mockk()
         }
     }
 
@@ -58,15 +60,5 @@ class SubscriptionPollerConsumerAdapterTest {
     fun `Polls consumers for coordinate absence events`() {
         subscriptionPoller.poll()
         verify { coordinatesConsumerSpy.consumeAbsent() }
-    }
-
-    @Test
-    fun `Creates Executor Service`() {
-        val poller = SubscriptionPollerConsumerAdapter(coordinatesConsumerSpy, messageConsumerSpy)
-
-        val executorService = poller.create()
-
-        assertNotNull(executorService)
-        executorService.shutdown()
     }
 }
