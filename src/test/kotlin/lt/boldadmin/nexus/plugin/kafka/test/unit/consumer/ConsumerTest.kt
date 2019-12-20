@@ -10,7 +10,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -32,27 +33,25 @@ class ConsumerTest {
     @MockK
     private lateinit var kafkaConsumerSpy: KafkaConsumer<String, String>
 
+    @MockK
+    private lateinit var executorServiceStub: ExecutorService
+
     private lateinit var consumer: Consumer
 
     @BeforeEach
     fun `Set up`() {
-        consumer = object: Consumer(consumerFactoryStub, loggerFactorySpy) {
+        consumer = object: Consumer(consumerFactoryStub, loggerFactorySpy, executorServiceStub) {
             override fun executeInfinitely(function: () -> Unit) {
                 function()
-            }
-
-            override fun create(): ExecutorService {
-                val slot = slot<Runnable>()
-                return mockk<ExecutorService>().apply {
-                    every { submit(capture(slot)) } answers {
-                        slot.captured.run()
-                        mockk()
-                    }
-                }
             }
         }
         every { kafkaConsumerSpy.subscribe(any<Collection<String>>()) } just Runs
         every { consumerFactoryStub.create<String>(any()) } returns kafkaConsumerSpy
+        val slot = slot<Runnable>()
+        every { executorServiceStub.submit(capture(slot)) } answers {
+            slot.captured.run()
+            mockk()
+        }
     }
 
     @Test
@@ -100,7 +99,7 @@ class ConsumerTest {
     fun `Executes polling infinitely`() {
         every { kafkaConsumerSpy.poll(any<Duration>()) } returns createConsumerRecords(emptyList())
 
-        val consumer = Consumer(consumerFactoryStub, loggerFactorySpy)
+        val consumer = Consumer(consumerFactoryStub, loggerFactorySpy, executorServiceStub)
         Thread { run { consumer.consume<String>("topic", emptyList(), Properties()) } }
             .apply {
                 start()
@@ -123,16 +122,6 @@ class ConsumerTest {
         verify { loggerSpy.error(capture(capturedArgs), any<Exception>()) }
         assertTrue(capturedArgs.single().contains("message"))
         assertTrue(capturedArgs.single().contains("topic"))
-    }
-
-    @Test
-    fun `Creates Executor Service`() {
-        val consumer = Consumer(mockk(), mockk())
-
-        val executorService = consumer.create()
-
-        assertNotNull(executorService)
-        executorService.shutdown()
     }
 
     private fun createConsumerRecords(values : Collection<String>): ConsumerRecords<String, String> {

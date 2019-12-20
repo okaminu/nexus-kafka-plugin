@@ -6,11 +6,11 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import java.time.Duration.ofSeconds
 import java.util.*
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 open class Consumer(
     private val consumerFactory: KafkaConsumerFactory,
-    private val loggerFactory: LoggerFactory
+    private val loggerFactory: LoggerFactory,
+    private val executor: ExecutorService
 ) {
 
     fun <T> consume(topic: String, functions: Collection<(T) -> Unit>, properties: Properties) {
@@ -26,10 +26,8 @@ open class Consumer(
         while (true) function()
     }
 
-    internal open fun create(): ExecutorService = Executors.newFixedThreadPool(3)
-
     private fun <T> consume(topic: String, functions: Collection<(T) -> Unit>, record: ConsumerRecord<String, T>) {
-        create().apply {
+        executor.apply {
             functions.forEach {
                 submit { executeWithExceptionLogging({ it(record.value()) }, topic) }
             }
