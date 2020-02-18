@@ -1,7 +1,7 @@
 package lt.boldadmin.nexus.plugin.kafka.serializer
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import lt.boldadmin.nexus.api.type.valueobject.Coordinates
+import lt.boldadmin.nexus.api.type.valueobject.location.Coordinates
 import org.apache.kafka.common.serialization.Serializer
 
 class CollaboratorCoordinatesSerializer: Serializer<Pair<String, Coordinates>> {

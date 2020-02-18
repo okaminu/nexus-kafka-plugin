@@ -4,7 +4,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import lt.boldadmin.nexus.api.event.subscriber.CollaboratorCoordinatesSubscriber
-import lt.boldadmin.nexus.api.type.valueobject.Coordinates
+import lt.boldadmin.nexus.api.type.valueobject.location.Coordinates
 import lt.boldadmin.nexus.plugin.kafka.consumer.CollaboratorCoordinatesConsumer
 import lt.boldadmin.nexus.plugin.kafka.consumer.Consumer
 import lt.boldadmin.nexus.plugin.kafka.deserializer.CollaboratorCoordinatesDeserializer
