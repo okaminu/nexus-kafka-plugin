@@ -5,7 +5,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import lt.boldadmin.nexus.api.type.valueobject.Coordinates
+import lt.boldadmin.nexus.api.type.valueobject.location.Coordinates
 import lt.boldadmin.nexus.plugin.kafka.event.publisher.CollaboratorCoordinatesPublisher
 import lt.boldadmin.nexus.plugin.kafka.factory.KafkaProducerFactory
 import lt.boldadmin.nexus.plugin.kafka.factory.ProducerPropertiesFactory

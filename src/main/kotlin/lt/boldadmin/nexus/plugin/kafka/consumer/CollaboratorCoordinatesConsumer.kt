@@ -1,7 +1,7 @@
 package lt.boldadmin.nexus.plugin.kafka.consumer
 
 import lt.boldadmin.nexus.api.event.subscriber.CollaboratorCoordinatesSubscriber
-import lt.boldadmin.nexus.api.type.valueobject.Coordinates
+import lt.boldadmin.nexus.api.type.valueobject.location.Coordinates
 import lt.boldadmin.nexus.plugin.kafka.deserializer.CollaboratorCoordinatesDeserializer
 import lt.boldadmin.nexus.plugin.kafka.factory.ConsumerPropertiesFactory
 import org.apache.kafka.common.serialization.StringDeserializer
