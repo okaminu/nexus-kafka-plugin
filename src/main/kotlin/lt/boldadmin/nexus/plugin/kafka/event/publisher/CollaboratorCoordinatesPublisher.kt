@@ -1,7 +1,7 @@
 package lt.boldadmin.nexus.plugin.kafka.event.publisher
 
 import lt.boldadmin.nexus.api.event.publisher.CollaboratorCoordinatesPublisher
-import lt.boldadmin.nexus.api.type.valueobject.Coordinates
+import lt.boldadmin.nexus.api.type.valueobject.location.Coordinates
 import lt.boldadmin.nexus.plugin.kafka.factory.KafkaProducerFactory
 import lt.boldadmin.nexus.plugin.kafka.factory.ProducerPropertiesFactory
 import lt.boldadmin.nexus.plugin.kafka.serializer.CollaboratorCoordinatesSerializer
