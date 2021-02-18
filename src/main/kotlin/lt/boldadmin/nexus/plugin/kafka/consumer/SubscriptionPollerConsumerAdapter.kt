@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService
 
 class SubscriptionPollerConsumerAdapter(
     private val coordinatesConsumer: CollaboratorCoordinatesConsumer,
+    private val messageConsumer: CollaboratorMessageConsumer,
     private val executor: ExecutorService
 ): SubscriptionPoller {
 
@@ -12,6 +13,7 @@ class SubscriptionPollerConsumerAdapter(
         executor.apply {
             submit { coordinatesConsumer.consumeAbsent() }
             submit { coordinatesConsumer.consumeCoordinates() }
+            submit { messageConsumer.consumeMessages() }
         }
     }
 }

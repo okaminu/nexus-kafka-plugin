@@ -4,6 +4,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import lt.boldadmin.nexus.plugin.kafka.consumer.CollaboratorCoordinatesConsumer
+import lt.boldadmin.nexus.plugin.kafka.consumer.CollaboratorMessageConsumer
 import lt.boldadmin.nexus.plugin.kafka.consumer.SubscriptionPollerConsumerAdapter
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,6 +18,9 @@ class SubscriptionPollerConsumerAdapterTest {
     private lateinit var coordinatesConsumerSpy: CollaboratorCoordinatesConsumer
 
     @MockK
+    private lateinit var messageConsumerSpy: CollaboratorMessageConsumer
+
+    @MockK
     private lateinit var executorServiceStub: ExecutorService
 
     private lateinit var subscriptionPoller: SubscriptionPollerConsumerAdapter
@@ -25,17 +29,25 @@ class SubscriptionPollerConsumerAdapterTest {
     fun `Set Up`() {
         subscriptionPoller = SubscriptionPollerConsumerAdapter(
             coordinatesConsumerSpy,
+            messageConsumerSpy,
             executorServiceStub
         )
 
         every { coordinatesConsumerSpy.consumeCoordinates() } just Runs
         every { coordinatesConsumerSpy.consumeAbsent() } just Runs
+        every { messageConsumerSpy.consumeMessages() } just Runs
 
         val slot = slot<Runnable>()
         every { executorServiceStub.submit(capture(slot)) } answers {
             slot.captured.run()
             mockk()
         }
+    }
+
+    @Test
+    fun `Polls consumers for message events`() {
+        subscriptionPoller.poll()
+        verify { messageConsumerSpy.consumeMessages() }
     }
 
     @Test
